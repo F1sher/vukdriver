@@ -1,0 +1,1 @@
+cmd_/home/das/job/240114vukdriver/EBE_driver/read_write.ko := ld -r -m elf_i386 -T /usr/src/linux-headers-3.8.0-35-generic/scripts/module-common.lds --build-id  -o /home/das/job/240114vukdriver/EBE_driver/read_write.ko /home/das/job/240114vukdriver/EBE_driver/read_write.o /home/das/job/240114vukdriver/EBE_driver/read_write.mod.o

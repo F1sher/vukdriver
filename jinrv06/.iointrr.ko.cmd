@@ -1,0 +1,1 @@
+cmd_/root/job/0511vukdriver/jinrv06/iointrr.ko := ld -r -m elf_i386 -T /usr/src/linux-2.6.37.4/scripts/module-common.lds --build-id  -o /root/job/0511vukdriver/jinrv06/iointrr.ko /root/job/0511vukdriver/jinrv06/iointrr.o /root/job/0511vukdriver/jinrv06/iointrr.mod.o
