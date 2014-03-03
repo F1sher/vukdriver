@@ -50,7 +50,7 @@ int read_testfile()
 	size_t result;
 	int i;
 	
-	pFile = fopen ( "/home/das/job/EBE_driver/r_wr", "r" );
+	pFile = fopen ( "/root/job/vukdriver-master/EBE_driver/test_file", "r" );
 	if (pFile==NULL) {fputs ("File error\n", stderr); return (1);}
 	
 	fseek (pFile, 0, SEEK_END);

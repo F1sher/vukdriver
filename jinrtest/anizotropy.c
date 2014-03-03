@@ -52,6 +52,48 @@ double max_bubble(double *x, int nums)
 	return z;
 }
 
+int maxnum_bubble_int(int *x, int nums)
+{
+	int i, max_num = 100;
+	
+	for(i=100; i<=nums-1200; i++)
+		if( (x[i] > x[max_num]) && (x[i] <= 2*(x[i-1]+x[i+1])) )
+			max_num = i;
+	
+	return max_num;
+}
+
+double center_of_pick(int *x, int left_border, int right_border)
+{
+	int i;
+	double xc, s;
+	
+	xc = s = 0.0;
+	
+	for(i=left_border; i<=right_border; i++) {
+		xc += (double)i*x[i];
+		s += (double)x[i];
+	}
+	
+	if(s<EPS) xc = 0;
+	else xc = xc/s;
+	
+	return xc;
+}
+
+void swap_spk(int *x, int xc, int nums)
+{
+	int i, p;
+	
+	for(i=0; (i<=xc) && (xc+i<=nums-1) && (xc-i>=0); i++) {
+		p = x[xc+i];
+		x[xc+i] = x[xc-i];
+		x[xc-i] = p;
+	}
+	
+	printf("i in swap spk = %d\n", i);
+}
+
 int anisotropy(double *res, double **y, double **F, double *compX90, double *compX180, double *R, double *dRcomp)
 {
 	//n array - time spk, e array - energy spk
@@ -67,7 +109,7 @@ int anisotropy(double *res, double **y, double **F, double *compX90, double *com
 	char name[7];
 	char ItoA[3];
 	
-	double xc[6], s[6], shift[6];
+	double *xc, *s, *shift;
 
 	/**************** ВЫДЕЛЕНИЕ ПАМЯТИ ****************/
 	for(i=0; i<12; i++)
@@ -75,6 +117,10 @@ int anisotropy(double *res, double **y, double **F, double *compX90, double *com
 	
 	for(i=0; i<6; i++)
 		m[i] = (int *)calloc(MAX_CH, sizeof(int));
+		
+	xc = (double *)calloc(6, sizeof(double));
+	s = (double *)calloc(6, sizeof(double));
+	shift = (double *)calloc(6, sizeof(double));
 	/****************  ****************/
 
 	for(i=0; i<12; i++)
@@ -91,110 +137,107 @@ int anisotropy(double *res, double **y, double **F, double *compX90, double *com
 		m[5][i] = n[10][i]+n[11][i]; //D3-4
 	}
 	
-	for(i=0; i<=6-1; i++) {
-		max_el[i] = m[i][100]; max_el_num[i] = 100;
-		for(j=100; j<=MAX_CH-100; j++)
-			if(m[i][j]>max_el[i] && m[i][j] <= 2*(m[i][j-1]+m[i][j+1])) {max_el[i]=m[i][j]; max_el_num[i]=j;}
+	for(i=0; i<6; i++) {
+		max_el_num[i] = maxnum_bubble_int(m[i], MAX_CH);
+		max_el[i] = m[i][max_el_num[i]];
+		printf("max el num = (%d, %d)\n", max_el_num[i], m[i][max_el_num[i]]);
 	}
 	
-	for(j=0; j<=6-1; j++) {
-		for(i=max_el_num[j]-100; i<=max_el_num[j]+99; i++) {
-			xc[j] += (double)i*(double)m[j][i];
-			s[j] += (double)m[j][i];
-		}
-		if(s[j]<EPS) xc[j] = 0.0; else xc[j] = xc[j]/s[j];
+	for(i=0; i<6; i++) {
+		xc[i] = center_of_pick(m[i], max_el_num[i]-100, max_el_num[i]+99);
+		printf("Xc[%d] = %.2f\n", i, xc[i]);
 	}
 	
-	for(i=0; i<=6-1; i++)
+	for(i=0; i<6; i++)
 		shift[i] = xc[0]-xc[i];
 		
-	for(i=0; i<=6-1; i++) {
+	for(i=0; i<6; i++) {
 		res[i] = xc[i];
 		res[i+6] = shift[i];
 		res[i+2*6] = max_el[i];
 	}
-
-	/*char test_fname[60];
-	int to_plot = 0;
-	FILE *in;
 	
-	for(i=0; i<=3; i+=2) {
-		sprintf(test_fname, "~/job/test/befshift-%d", to_plot+i);
-		in = fopen(test_fname, "w+");
+	FILE *pFile;
+	for(i=0; i<6; i++) {
+		pFile = fopen (g_strdup_printf("../0SUMtest%d", i),"w+");
 		for(j=0; j<=MAX_CH-1; j++)
-			
-	}*/
+			fprintf (pFile, "%d %d\n", j, m[i][j]);
+		fclose(pFile);
+	}
 	
 	//SWAP 1 - Ti, 0 - In
-	for(i=nucleus, k=0; i<=12-1; i+=2, k++) {
-		printf("swap i = %d z1 = %d\n", i, (int)round(xc[k]));
-		for(j=0, z1=(int)round(xc[k]); j<=z1; j++) {
-			if(j+z1>MAX_CH-1 || z1-j<0) break;
-			p = n[i][z1-j];
-			n[i][z1-j] = n[i][z1+j];
-			n[i][z1+j] = p;
-	//		printf("jswap i = %d\n", i);
-		}
+	for(i=nucleus; i<12; i+=2) {
+		printf("xc[%d] = %d\n", i/2, (int)xc[i/2]);
+		swap_spk(n[i], (int)round(xc[i/2]), MAX_CH);
 	}
 
-	for(z3=0; z3<=0; z3++) {
-	
-	
-	for(i=2, p=1; i<=12-1; i++, p++) {
-		if(i%2==0 && i!=2) p--;
-		if(abs(i-p)<512) k=(int)shift[i-p]; else k=0;
-		printf("i-p = %d k= %d shift[i-p]-k = %.2f\n", i-p, k, shift[i-p]-k);
-		if(k>0) {
-			for(j=k+1; (j-k)<=MAX_CH-1; j++) {
-				y[i][j] = (double)n[i][j-k]*(k+1.0-shift[i-p])+(double)n[i][j-k-1]*(shift[i-p]-k);
-//				printf("%f %d %f %d %f\n", y[i][j], n[i][j-k], k+1.0-shift[i-p], n[i][j-k-1], shift[i-p]-k);
-			}
-			y[i][k] = (double)n[i][0]*(k+1.0-shift[i-p]);
-			for(j=0; j<=k-1; j++)
-				y[i][j] = 0.0;
-		}
-		
-		else {
-			for(j=0; (j-k)<=MAX_CH-2; j++) {
-				y[i][j] = (double)n[i][j-k]*(1.0+shift[i-p]-(double)k)+(double)n[i][j-k+1]*((double)k-shift[i-p]);
-			}
-			for(j=MAX_CH-1+k; j<=MAX_CH-1; j++)
-				y[i][j] = 0.0;
-		}
+	for(i=0; i<=MAX_CH-1; i++) {
+		m[0][i] = n[0][i]+n[1][i]; //D1-2
+		m[1][i] = n[2][i]+n[3][i]; //D1-3
+		m[2][i] = n[4][i]+n[5][i]; //D1-4
+		m[3][i] = n[6][i]+n[7][i]; //D2-3
+		m[4][i] = n[8][i]+n[9][i]; //D2-4
+		m[5][i] = n[10][i]+n[11][i]; //D3-4
+	}
+
+	for(i=0; i<6; i++) {
+		pFile = fopen (g_strdup_printf("../1SUMtest%d", i),"w+");
+		for(j=0; j<=MAX_CH-1; j++)
+			fprintf (pFile, "%d %d\n", j, m[i][j]);
+		fclose(pFile);
 	}
 	
-		for(i=2; i<=12-1; i++)
-			for(j=0; j<=MAX_CH-1; j++) {
-				u=round(y[i][j]);
-				n[i][j] = (int)u;
-			}
+	for(i=0; i<6; i++) {
+		max_el_num[i] = maxnum_bubble_int(m[i], MAX_CH);
+		max_el[i] = m[i][max_el_num[i]];
+		printf("max el num = (%d, %d)\n", max_el_num[i], m[i][max_el_num[i]]);
+	}
 	
-		for(i=0; i<=MAX_CH-1; i++) {
-			m[0][i] = n[0][i]+n[1][i]; //D1-2
-			m[1][i] = n[2][i]+n[3][i]; //D1-3
-			m[2][i] = n[4][i]+n[5][i]; //D1-4
-			m[3][i] = n[6][i]+n[7][i]; //D2-3
-			m[4][i] = n[8][i]+n[9][i]; //D2-4
-			m[5][i] = n[10][i]+n[11][i]; //D3-4
-		}
+	for(i=0; i<6; i++) {
+		xc[i] = center_of_pick(m[i], max_el_num[i]-100, max_el_num[i]+99);
+		printf("Xc[%d] = %.2f\n", i, xc[i]);
+	}
 	
-		for(i=0; i<=6-1; i++) {
-			max_el[i] = m[i][100]; max_el_num[i] = 100;
-			for(j=100; j<=MAX_CH-100; j++)
-				if(m[i][j]>max_el[i] && m[i][j] <= 2*(m[i][j-1]+m[i][j+1])) {max_el[i]=m[i][j]; max_el_num[i]=j;}
-		}
+	for(i=0; i<6; i++) {
+		shift[i] = xc[0]-xc[i];
+		printf("shift[%d] = %.2f\n", i, shift[i]);
+	}
+
+	for(i=2; i<12; i++) {
+		p = i/2;
+		k = (int)round(shift[p]);
+		printf("k = %d p = %d\n", k, p);
+		if(k>0)
+			for(j=MAX_CH-1; j>=k; j--)
+				n[i][j] = n[i][j-k];
+		else if(k<0)
+			for(j=0; j<=MAX_CH-1-k; j++)
+				n[i][j] = n[i][j-k];
+	}
+			
+	for(i=0; i<=MAX_CH-1; i++) {
+		m[0][i] = n[0][i]+n[1][i]; //D1-2
+		m[1][i] = n[2][i]+n[3][i]; //D1-3
+		m[2][i] = n[4][i]+n[5][i]; //D1-4
+		m[3][i] = n[6][i]+n[7][i]; //D2-3
+		m[4][i] = n[8][i]+n[9][i]; //D2-4
+		m[5][i] = n[10][i]+n[11][i]; //D3-4
+	}
+		
+	for(i=0; i<6; i++) {
+		max_el_num[i] = maxnum_bubble_int(m[i], MAX_CH);
+		max_el[i] = m[i][max_el_num[i]];
+		printf("max el num = (%d, %d)\n", max_el_num[i], m[i][max_el_num[i]]);
+	}
 	
-		for(j=0; j<=6-1; j++) {
-			for(i=max_el_num[j]-100; i<=max_el_num[j]+99; i++) {
-				xc[j] += (double)i*m[j][i];
-				s[j] += (double)m[j][i];
-			}
-			if(s[j]<EPS) xc[j] = 0.0; else xc[j] = xc[j]/s[j];
-		}
+	for(i=0; i<6; i++) {
+		xc[i] = center_of_pick(m[i], max_el_num[i]-100, max_el_num[i]+99);
+		printf("Xc[%d] = %.2f\n", i, xc[i]);
+	}
 	
-		for(i=0; i<=6-1; i++)
-			shift[i] = xc[0]-xc[i];
-	
+	for(i=0; i<6; i++) {
+		shift[i] = xc[0]-xc[i];
+		printf("shift[%d] = %.2f\n", i, shift[i]);
 	}
 	
 	for(i=0; i<=MAX_CH-1; i++) {
@@ -237,6 +280,7 @@ int anisotropy(double *res, double **y, double **F, double *compX90, double *com
 			y[8][j] = (double)n[8][j];
 			y[10][j] = (double)n[10][j];
 	}
+	
 	// y_background = A * exp(Bx_j)
 /*	double alpha[12], beta[12];
 	double sxlny[12], sx[12], slny[12], ssqrx[12], ssqrlny[12];
@@ -266,16 +310,29 @@ int anisotropy(double *res, double **y, double **F, double *compX90, double *com
 			F[i][j] = alpha[i]*exp( beta[i]*j ); */
 	
 	//y_background = const	
-	for(i=0; i<=12-1; i++)
+	for(i=0; i<12; i++)
 		for(j=BG_START; j<BG_STOP; j++)
 			F[i][0] += y[i][j];
 			
-	for(i=0; i<=12-1; i++)
+	for(i=0; i<12; i++)
 		F[i][0] = F[i][0] / (double)(BG_STOP-BG_START);
 	
-	for(i=0; i<=12-1; i++)
+	for(i=0; i<12; i++)
 		for(j=1; j<=MAX_CH-1; j++)
 			F[i][j] = F[i][0];
+			
+	for(i=0; i<12; i++) {
+		pFile = fopen (g_strdup_printf("../Y%d", i),"w+");
+		for(j=0; j<=MAX_CH-1; j++)
+			fprintf (pFile, "%d %.2f\n", j, y[i][j]);
+		fclose(pFile);
+	}
+	for(i=0; i<12; i++) {
+		pFile = fopen (g_strdup_printf("../F%d", i),"w+");
+		for(j=0; j<=MAX_CH-1; j++)
+			fprintf (pFile, "%d %.2f\n", j, F[i][j]);
+		fclose(pFile);
+	}
 			
 	//y_background = A + B*exp(x_j)
 	/*double sy[12], sex[12], syex[12], se2x[12];
@@ -300,8 +357,8 @@ int anisotropy(double *res, double **y, double **F, double *compX90, double *com
 			F[i][j] = alpha[i] + beta[i]*exp(j*TAU/3.6);
 	*/
 	
-	printf("before background y[11][550] = %E\n", y[11][550]);
-	printf("F[11][550] = %E\n", F[11][550]);
+	printf("before background y[11][550] = %.1f\n", y[11][550]);
+	printf("F[11][550] = %.1f\n", F[11][550]);
 	for(i=0; i<=12-1; i++)
 		for(j=0; j<=MAX_CH-1; j++)
 			if((v1=(y[i][j] - F[i][j]))<EPS)
@@ -309,12 +366,15 @@ int anisotropy(double *res, double **y, double **F, double *compX90, double *com
 			else
 				y[i][j] = v1;
 	
-	printf("afterbackground y[11][2172] = %E; background = %E\n", y[11][2172], F[11][2172]);
+	printf("afterbackground y[11][550] = %.1f; background = %.1f\n", y[11][550], F[11][550]);
 	
 	for(i=0; i<=12-1; i++)
-		printf("y[%d][2172] = %E\n", i, y[i][2172]);
+		printf("y[%d][550] = %.1f\n", i, y[i][550]);
 	
-	double X90[MAX_CH], X180[MAX_CH];
+	double *X90, *X180;
+	X90 = (double *)calloc(MAX_CH, sizeof(double));
+	X180 = (double *)calloc(MAX_CH, sizeof(double));
+	
 	for(j=0; j<=MAX_CH-1; j++) {
 		v1 = y[0][j]*y[1][j]*y[4][j]*y[5][j]*y[6][j]*y[7][j]*y[10][j]*y[11][j];
 	//	X90[j] = pow(y[0][j], 1.0/8.0)*pow(y[1][j],1.0/8.0)*pow(y[4][j],1.0/8.0)*pow(y[5][j],1.0/8.0)*pow(y[6][j],1.0/8.0)*pow(y[7][j],1.0/8.0)*pow(y[10][j],1.0/8.0)*pow(y[11][j],1.0/8.0);
@@ -345,8 +405,11 @@ int anisotropy(double *res, double **y, double **F, double *compX90, double *com
 		if (isnan(R[j])) printf("Error! R[%d] is NaN! compX90[%d] = %E; comX180[%d] = %E\n", j, j, compX90[j], j, compX180[j]);
 		if (isinf(R[j])) printf("Error! R[%d] is Inf! and = %E\n", j, R[j]);
 	}
-
-	double errSum[2][MAX_CH];
+	
+	double **errSum = (double **)malloc(MAX_CH*sizeof(double *));
+	errSum[0] = (double *)calloc(MAX_CH, sizeof(double));
+	errSum[1] = (double *)calloc(MAX_CH, sizeof(double));
+	
 	for(j=0; j<=MAX_CH-1; j++) {
 		errSum[0][j] = (y[0][j] + 2.0*F[0][j])/sqr(y[0][j]) + \
 						(y[1][j] + 2.0*F[1][j])/sqr(y[1][j]) + \
@@ -378,15 +441,18 @@ int anisotropy(double *res, double **y, double **F, double *compX90, double *com
 		}
 		
 	for(p=0; p<=MAX_CH/COMP-1; p++)
-		dRcomp[p] = pow(dRcomp[p], 1.0/2.0);
+		dRcomp[p] = pow(dRcomp[p], 1.0/2.0);*/
 
-	for(i=0; i<12; i++)
-		free(n[i]);
+//	for(i=0; i<12; i++)
+//		free(n[i]);
 	free(n);
 	
-	for(i=0; i<6; i++)
-		free(m[i]);
+//	for(i=0; i<6; i++)
+//		free(m[i]);
 	free(m);
+	
+	free(X90);
+	free(X180);
 
 	printf("anisotropy function end\n");
 	return 0;

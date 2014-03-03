@@ -1,1 +1,1 @@
-obj-m += read_write.o
+obj-m += iointrr+EBE.o

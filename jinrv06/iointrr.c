@@ -86,7 +86,7 @@ irqreturn_t jinr_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 	static long int num_interrupts=0;
 //	static int spk[12][MAX_CH];
 	
-	printk(KERN_INFO "Interrupted, TimerIntrpt = %d\n", TimerIntrpt);
+	printk(KERN_INFO "Interrupted, TimerIntrpt = %d, Status = %d\n", TimerIntrpt, true_data_info.status);
 	
 	num_interrupts++;
 	

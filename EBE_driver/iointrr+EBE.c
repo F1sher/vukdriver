@@ -71,7 +71,7 @@ struct true_exp_data {
 };
 
 irqreturn_t jinr_interrupt(int irq, void *dev_id, struct pt_regs *regs)
-{
+{	
 	int i, j;
 	unsigned char N[12];
 	static long int num_interrupts=-8;
@@ -209,12 +209,12 @@ irqreturn_t jinr_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 	M[num_interrupts+0] = N[0]; //N1
 	M[num_interrupts+1] = N[1];
 	
-	if (num_interrupts >= 4096-1) {
+	if (num_interrupts+7 >= 4096-1) {
 		mm_segment_t oldfs;
 		oldfs = get_fs();
 		set_fs(get_ds());
 		
-		char *str_to_write = (char *)kmalloc(32*512*sizeof(char), GFP_KERNEL);
+/*		char *str_to_write = (char *)kmalloc(32*512*sizeof(char), GFP_KERNEL);
 		char *str_temp = (char *)kmalloc(32*sizeof(char), GFP_KERNEL);
 		
 		sprintf(str_temp, "%u %u %u %u %u %u %u %u\n", M[0], M[1], M[2], M[3], M[4], M[5], M[6], M[7]);
@@ -225,7 +225,7 @@ irqreturn_t jinr_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 			if(M[8*j+0] == M[8*j+1] && M[8*j+0] == 0) printk(KERN_INFO "Warning! all m=0 i=%d\n", j); 
 			sprintf(str_temp, "%u %u %u %u %u %u %u %u\n", M[8*j+0], M[8*j+1], M[8*j+2], M[8*j+3], M[8*j+4], M[8*j+5], M[8*j+6], M[8*j+7]);
 			strcat(str_to_write, str_temp);
-		}
+		}*/
 		
 	//	printk(KERN_INFO "str = %s; m0 = %u, m1 = %u\n", str, M[0], M[1]);
 		vfs_write(test_file, M, 4096*sizeof(unsigned char), &test_file->f_pos);
@@ -237,8 +237,8 @@ irqreturn_t jinr_interrupt(int irq, void *dev_id, struct pt_regs *regs)
 		
 		num_interrupts = -8;
 		
-		kfree(str_to_write);
-		kfree(str_temp);
+	//	kfree(str_to_write);
+	//	kfree(str_temp);
 	}
 	}
 
@@ -406,7 +406,7 @@ void intrpt_routine(struct work_struct *test)
 	TimerIntrpt++;
 //	data[ARRAY_EL-1]++;
 	 
-	if (TimerIntrpt == 3600 || die == 2) {
+	if (die == 2) {
 		printk(KERN_INFO "The end\n");
 		die = 1;		/* keep intrp_routine from queueing itself */
 		true_data_info.status = 0;
@@ -544,7 +544,7 @@ int init_module()
 	printk(KERN_INFO "Initializing Netlink Socket");
 	nl_sk = netlink_kernel_create(&init_net, NETLINK_NITRO, 0, nl_data_ready, NULL, THIS_MODULE);
 	
-	test_file = filp_open("/root/job/EBE_driver/test_file", O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+	test_file = filp_open("/root/job/vukdriver-master/EBE_driver/test_file", O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
 	if(test_file == NULL)
 		printk(KERN_INFO "Open error\n");
 	true_data_info.status = 2;

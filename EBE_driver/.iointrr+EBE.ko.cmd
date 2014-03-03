@@ -1,1 +1,1 @@
-cmd_/root/job/EBE_driver/iointrr+EBE.ko := ld -r -m elf_i386 -T /usr/src/linux-2.6.37.4/scripts/module-common.lds --build-id  -o /root/job/EBE_driver/iointrr+EBE.ko /root/job/EBE_driver/iointrr+EBE.o /root/job/EBE_driver/iointrr+EBE.mod.o
+cmd_/root/job/vukdriver-master/EBE_driver/iointrr+EBE.ko := ld -r -m elf_i386 -T /usr/src/linux-2.6.37.4/scripts/module-common.lds --build-id  -o /root/job/vukdriver-master/EBE_driver/iointrr+EBE.ko /root/job/vukdriver-master/EBE_driver/iointrr+EBE.o /root/job/vukdriver-master/EBE_driver/iointrr+EBE.mod.o

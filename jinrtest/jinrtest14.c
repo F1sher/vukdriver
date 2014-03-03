@@ -29,7 +29,12 @@
 #define ZOOM_EN_Y	0.5
 #define LR_EN_X	100
 
-#define READ_ONLINE_PERIOD 20000 
+#define READ_ONLINE_PERIOD 20000
+
+#define	BUFFER_DIR_PLACE	0
+#define BUFFER_START_PLACE	1
+#define BUFFER_ACC_PLACE	3
+#define BUFFER_INT_PLACE	5
 
 extern int COMP = 8;
 
@@ -120,7 +125,7 @@ struct {
 	GtkWidget *entry_rrange;
 } coord_xy_en;
 
-extern char *folder2spk = "/home/das/job/EbE/";
+extern char *folder2spk = "/home/das/job/vukdriver-master/";
 static char *folder2initialspk = "./";
 extern char *folder2readspk ="./";
 
@@ -1596,10 +1601,10 @@ static void analyze_energy_drawing(GtkWidget *widget, cairo_t *cr)
 	double max_Y = 1.0;
 	
 	cairo_rectangle(cr, 0.0, 0.0, width, height);
-	cairo_set_source_rgba (cr, 1.0, 1.0, 1.0, 1.0);
+	cairo_set_source_rgba (cr, 0.0, 0.0, 0.0, 1.0);
 	cairo_fill(cr);
 	
-	cairo_set_source_rgba (cr, 0.0, 0.0, 0.0, 1.0);
+	cairo_set_source_rgba (cr, 1.0, 1.0, 1.0, 1.0);
 	cairo_set_line_width (cr, 0.5);
 	cairo_rectangle(cr, 0.0, 0.0, width-left_shift, height-bot_shift);
 	cairo_stroke(cr);
@@ -1712,7 +1717,7 @@ static void analyze_energy_drawing(GtkWidget *widget, cairo_t *cr)
 			
 			if(gflag.exec == 1) {
 				printf("x0 = %.2f x30 = %.2f x31 = %.2f\n", glob.x[0], glob.x3[0], glob.x3[1]);
-				cairo_set_source_rgb(cr, 0.0, 0.0, 0.0);
+				cairo_set_source_rgba (cr, 1.0, 1.0, 1.0, 1.0);
 				
 				GtkTextIter iter_start, iter_stop;
 				int *kindex = (int *)calloc(3, sizeof(int));
@@ -1771,7 +1776,7 @@ static void analyze_energy_drawing(GtkWidget *widget, cairo_t *cr)
 				printf("kind0 = %d kind1 = %d x_start = %d\n", kindex[0], kindex[1], x_start);
 				
 				cairo_set_line_width (cr, 1.5);
-				cairo_set_source_rgb(cr, 0.0, 0.0, 0.0);
+				cairo_set_source_rgba (cr, 1.0, 1.0, 1.0, 1.0);
 				
 				cairo_move_to(cr, (double)(width-5.0-left_shift)/(x_stop-x_start)*(kindex[0]-x_start-x_left+x_right)+2.5, height-bot_shift);
 				cairo_line_to(cr, (double)(width-5.0-left_shift)/(x_stop-x_start)*(kindex[0]-x_start-x_left+x_right)+2.5, height-15.0-(double)(u[5]*kindex[0]+u[6])/y_comp-2.5);
@@ -2125,8 +2130,8 @@ void read_plot_spk( GtkWidget *widget, gpointer window )
 	{
 		strcpy(infostruct.dir, folder2spk);
 		GtkTextIter iter, end;
-		gtk_text_buffer_get_iter_at_line(info_buffer, &iter, 0);
-		gtk_text_buffer_get_iter_at_line_offset(info_buffer, &end, 1, 0);
+		gtk_text_buffer_get_iter_at_line(info_buffer, &iter, BUFFER_DIR_PLACE);
+		gtk_text_buffer_get_iter_at_line_offset(info_buffer, &end, BUFFER_DIR_PLACE+1, 0);
 		gtk_text_buffer_delete(info_buffer, &iter, &end);
 		gtk_text_buffer_get_iter_at_line(info_buffer, &iter, 0);
 		gtk_text_buffer_insert_with_tags_by_name(info_buffer, &iter, 
@@ -2188,7 +2193,7 @@ void read_plot_spk( GtkWidget *widget, gpointer window )
 							spectras->energyspk[0][N[2]]++; spectras->energyspk[2][N[4]]++; 
 							if (N[2] >= infostruct.LD[0] && N[2] <= infostruct.LD[1] && N[4] >= infostruct.RD[4] && N[4] <= infostruct.RD[5])
 								spectras->timespk[3][N[1]]++;
-							else if (N[2] >= infostruct.RD[4] && N[2] <= infostruct.RD[5] && N[4] >= infostruct.LD[0] && N[4] <= infostruct.LD[1])
+							else if (N[2] >= infostruct.RD[0] && N[2] <= infostruct.RD[1] && N[4] >= infostruct.LD[4] && N[4] <= infostruct.LD[5])
 								spectras->timespk[2][N[1]]++;
 						break;
 						};
@@ -2196,7 +2201,7 @@ void read_plot_spk( GtkWidget *widget, gpointer window )
 							spectras->energyspk[0][N[2]]++; spectras->energyspk[3][N[6]]++; 
 							if (N[2] >= infostruct.LD[0] && N[2] <= infostruct.LD[1] && N[6] >= infostruct.RD[6] && N[6] <= infostruct.RD[7])
 								spectras->timespk[5][N[1]]++;
-							else if (N[2] >= infostruct.RD[6] && N[2] <= infostruct.RD[7] && N[6] >= infostruct.LD[0] && N[6] <= infostruct.LD[1])
+							else if (N[2] >= infostruct.RD[0] && N[2] <= infostruct.RD[1] && N[6] >= infostruct.LD[6] && N[6] <= infostruct.LD[7])
 								spectras->timespk[4][N[1]]++;
 						break;
 						};
@@ -2204,7 +2209,7 @@ void read_plot_spk( GtkWidget *widget, gpointer window )
 							spectras->energyspk[1][N[3]]++; spectras->energyspk[2][N[4]]++; 
 							if (N[3] >= infostruct.LD[2] && N[3] <= infostruct.LD[3] && N[4] >= infostruct.RD[4] && N[4] <= infostruct.RD[5])
 								spectras->timespk[7][N[1]]++;
-							else if (N[3] >= infostruct.RD[4] && N[3] <= infostruct.RD[5] && N[4] >= infostruct.LD[2] && N[4] <= infostruct.LD[3])
+							else if (N[3] >= infostruct.RD[2] && N[3] <= infostruct.RD[3] && N[4] >= infostruct.LD[4] && N[4] <= infostruct.LD[5])
 								spectras->timespk[6][N[1]]++;
 						break;
 						};
@@ -2212,7 +2217,7 @@ void read_plot_spk( GtkWidget *widget, gpointer window )
 							spectras->energyspk[1][N[3]]++; spectras->energyspk[3][N[6]]++; 
 							if (N[3] >= infostruct.LD[2] && N[3] <= infostruct.LD[3] && N[6] >= infostruct.RD[6] && N[6] <= infostruct.RD[7])
 								spectras->timespk[9][N[1]]++;
-							else if (N[3] >= infostruct.RD[6] && N[3] <= infostruct.RD[7] && N[6] >= infostruct.LD[2] && N[6] <= infostruct.LD[3])
+							else if (N[3] >= infostruct.RD[2] && N[3] <= infostruct.RD[3] && N[6] >= infostruct.LD[6] && N[6] <= infostruct.LD[7])
 								spectras->timespk[8][N[1]]++;
 							break;
 						};
@@ -2220,7 +2225,7 @@ void read_plot_spk( GtkWidget *widget, gpointer window )
 							spectras->energyspk[2][N[4]]++; spectras->energyspk[3][N[6]]++; 
 							if (N[4] >= infostruct.LD[4] && N[4] <= infostruct.LD[5] && N[6] >= infostruct.RD[6] && N[6] <= infostruct.RD[7])
 								spectras->timespk[11][N[1]]++;
-							else if (N[4] >= infostruct.RD[6] && N[4] <= infostruct.RD[7] && N[6] >= infostruct.LD[2] && N[6] <= infostruct.LD[3])
+							else if (N[4] >= infostruct.RD[4] && N[4] <= infostruct.RD[5] && N[6] >= infostruct.LD[6] && N[6] <= infostruct.LD[7])
 								spectras->timespk[10][N[1]]++;
 							break;
 						};
@@ -2298,8 +2303,8 @@ void get_online_data_cycle( gpointer data )
 
 	strncpy(infostruct.dir, SIMPLE_DEVICE, 60);
 	GtkTextIter iter, end;
-	gtk_text_buffer_get_iter_at_line(info_buffer, &iter, 6);
-	gtk_text_buffer_get_iter_at_line_offset(info_buffer, &end, 10, 16);
+	gtk_text_buffer_get_iter_at_line(info_buffer, &iter, BUFFER_INT_PLACE);
+	gtk_text_buffer_get_iter_at_line_offset(info_buffer, &end, BUFFER_INT_PLACE+4, 16);
 	gtk_text_buffer_delete(info_buffer, &iter, &end);
 	
 	gtk_text_buffer_insert_with_tags_by_name(info_buffer, &iter, 
@@ -2697,10 +2702,10 @@ void read_spk(GtkWidget *menuitem, gpointer window)
 
 	strcpy(infostruct.dir, folder2readspk);
 	GtkTextIter iter, end;
-	gtk_text_buffer_get_iter_at_line(info_buffer, &iter, 1);
-	gtk_text_buffer_get_iter_at_line_offset(info_buffer, &end, 2, 0);
+	gtk_text_buffer_get_iter_at_line(info_buffer, &iter, BUFFER_DIR_PLACE);
+	gtk_text_buffer_get_iter_at_line_offset(info_buffer, &end, BUFFER_DIR_PLACE+1, 0);
 	gtk_text_buffer_delete(info_buffer, &iter, &end);
-	gtk_text_buffer_get_iter_at_line(info_buffer, &iter, 1);
+	gtk_text_buffer_get_iter_at_line(info_buffer, &iter, BUFFER_DIR_PLACE);
 	gtk_text_buffer_insert_with_tags_by_name(info_buffer, &iter, 
 			g_strdup_printf("Dir: %s\n", infostruct.dir), -1, "bold", NULL);
 	
@@ -2732,8 +2737,8 @@ void clock_func(gpointer data)
 			
 	buffer = g_strdup_printf("%s", infostruct.start);
 	
+	printf("in clock start = %s\n", infostruct.start);
 	if( compare_dates(infostruct.start) >= 0 || infostruct.status == 0) {
-		printf("stoped time = %ld\n", compare_dates(buffer));
 		strcpy(infostruct.start, "Stoped");
 		gtk_text_buffer_get_iter_at_line(info_buffer, &iter, 2);
 		gtk_text_buffer_get_iter_at_line_offset(info_buffer, &end, 3, 0);
@@ -2743,7 +2748,6 @@ void clock_func(gpointer data)
 		gtk_spinner_stop(GTK_SPINNER(spinner_get_data));
 	}
 	else {
-		printf("started time = %ld\n", compare_dates(buffer));
 		gtk_spinner_start(GTK_SPINNER(spinner_get_data));
 	}
 	
@@ -2768,26 +2772,25 @@ void *doThreadClock(void *arg)
 	
 	gtk_label_set_text(GTK_LABEL(timer_label), g_strdup_printf("Time: %s", buffer));
 	
-	/*
-	gtk_text_buffer_get_iter_at_line(info_buffer, &iter_status, 2);
-	gtk_text_buffer_get_iter_at_line_offset(info_buffer, &end_status, 3, 0);
+	printf("in thread start = %s\n", infostruct.start);
+	gtk_text_buffer_get_iter_at_line(info_buffer, &iter_status, BUFFER_START_PLACE);
+	gtk_text_buffer_get_iter_at_line_offset(info_buffer, &end_status, BUFFER_START_PLACE+1, 0);
 	if( compare_dates(infostruct.start) >= 0 || infostruct.status == 0) {
-		printf("stoped time = %ld\n", compare_dates(buffer));
+	//	printf("stoped time = %ld\n", compare_dates(buffer));
 		strcpy(infostruct.start, "Stoped");
 		printf("123");
 		gtk_text_buffer_delete(info_buffer, &iter_status, &end_status);
-		gtk_text_buffer_get_iter_at_line(info_buffer, &iter_status, 2);
+		gtk_text_buffer_get_iter_at_line(info_buffer, &iter_status, BUFFER_START_PLACE);
 		gtk_text_buffer_insert_with_tags_by_name(info_buffer, &iter_status, 
 			g_strdup_printf("Start: %s\n", infostruct.start), -1, "bold", NULL);
 		gtk_spinner_stop(GTK_SPINNER(spinner_get_data));
 		printf("456");
 	}
 	else {
-		printf("started time = %ld\n", compare_dates(buffer));
+	//	printf("started time = %ld\n", compare_dates(buffer));
 		gtk_spinner_start(GTK_SPINNER(spinner_get_data));
-	}*/
+	}
 
-	printf("789");
 	if(first_start) {
 		strftime(buffer, 40, "%S", loctime);
 		sleep(60-atoi(buffer));
@@ -3106,7 +3109,7 @@ int main(int argc, char **argv)
         "justification", GTK_JUSTIFY_CENTER, NULL);
     gtk_text_buffer_create_tag(info_buffer, "red bg", 
 		"background", "#770011", NULL);
-	gtk_text_buffer_get_iter_at_line(info_buffer, &iter, 1);
+	gtk_text_buffer_get_iter_at_line(info_buffer, &iter, BUFFER_DIR_PLACE);
 	
 	label_info = gtk_label_new(NULL);
 	if (getcwd(infostruct.dir, sizeof(infostruct.dir)) != NULL) {

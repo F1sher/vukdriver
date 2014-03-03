@@ -105,10 +105,10 @@ static gboolean analyze_time_draw_cb(GtkWidget *widget, cairo_t *cr,
 	static int graph_nums_inverse, graph_nums_reverse;
 	
 	cairo_rectangle(cr, 0.0, 0.0, width, height);
-	cairo_set_source_rgba (cr, 1.0, 1.0, 1.0, 1.0);
+	cairo_set_source_rgba (cr, 0.0/255.0, 0.0/255.0, 0.0/255.0, 1.0);
 	cairo_fill(cr);
 	
-	cairo_set_source_rgba (cr, 0.0, 0.0, 0.0, 1.0);
+	cairo_set_source_rgba (cr, 1.0, 1.0, 1.0, 1.0);
 	cairo_set_line_width (cr, 0.5);
 	cairo_rectangle(cr, 0.0, 0.0, width-left_shift, height-bot_shift);
 	cairo_stroke(cr);
@@ -314,7 +314,7 @@ static gboolean analyze_time_draw_cb(GtkWidget *widget, cairo_t *cr,
 				float u[7];
 				int m;
 				
-				cairo_set_source_rgb(cr, 0.0, 0.0, 0.0);
+				cairo_set_source_rgba (cr, 1.0, 1.0, 1.0, 1.0);
 				
 				kindex[0] = x_left+x_start+MAX_CH*(time_gflag.x3[0])/((width-left_shift)*MAX_CH/(x_stop-x_start));
 				kindex[1] = x_left+x_start+MAX_CH*(time_gflag.x3[1])/((width-left_shift)*MAX_CH/(x_stop-x_start));
@@ -348,11 +348,14 @@ static gboolean analyze_time_draw_cb(GtkWidget *widget, cairo_t *cr,
 				
 				//u5 = k u6 = b y=kx+b
 				
+				kindex[0] = x_left+x_start+MAX_CH*(time_gflag.x3[0])/((width-left_shift)*MAX_CH/(x_stop-x_start));
+				kindex[1] = x_left+x_start+MAX_CH*(time_gflag.x3[1])/((width-left_shift)*MAX_CH/(x_stop-x_start));
 				if(time_gflag.sum_t != 1) {
+					printf("kindex0 = %d kindex1 = %d\n", kindex[0], kindex[1]);
 					cairo_set_line_width (cr, 0.2);
 					cairo_set_source_rgb(cr, 180.0/255.0, 59.0/255.0, 91.0/255.0);
 					cairo_move_to(cr, (double)(width-left_shift)/(x_stop-x_start)*(kindex[0]-x_start-x_left+x_right), height-bot_shift-(double)spectras->timespk[m][kindex[0]]/y_comp);
-					for(j=kindex[0]; j<kindex[1]; j++)
+					for(j=kindex[0]; j<kindex[1] && j<MAX_CH; j++)
 						if((double)spectras->timespk[m][j]>=u[5]*j+u[6])
 							cairo_line_to(cr, (double)(width-left_shift)/(x_stop-x_start)*(j-x_start-x_left+x_right)+2.5, height-bot_shift-(double)spectras->timespk[m][j]/y_comp-2.5);
 						else
@@ -360,8 +363,9 @@ static gboolean analyze_time_draw_cb(GtkWidget *widget, cairo_t *cr,
 					cairo_close_path(cr);
 					cairo_fill(cr);
 				
+					printf("0timespk\n");
 					cairo_set_line_width (cr, 1.5);
-					cairo_set_source_rgb(cr, 0.0, 0.0, 0.0);
+					cairo_set_source_rgba (cr, 1.0, 1.0, 1.0, 1.0);
 				
 					cairo_move_to(cr, (double)(width-left_shift)/(x_stop-x_start)*(kindex[0]-x_start-x_left+x_right), height-bot_shift);
 					cairo_line_to(cr, (double)(width-left_shift)/(x_stop-x_start)*(kindex[0]-x_start-x_left+x_right), height-bot_shift-(double)spectras->timespk[m][kindex[0]]/(y_comp));
@@ -375,6 +379,7 @@ static gboolean analyze_time_draw_cb(GtkWidget *widget, cairo_t *cr,
 					cairo_move_to(cr, (double)(width-left_shift)/(x_stop-x_start)*(kindex[2]-x_start-x_left+x_right), height-bot_shift);
 					cairo_line_to(cr, (double)(width-left_shift)/(x_stop-x_start)*(kindex[2]-x_start-x_left+x_right), height-bot_shift-(double)spectras->timespk[m][kindex[2]]/(y_comp));
 					cairo_stroke(cr);
+					printf("1timespk\n");
 				}
 				else {
 					cairo_set_line_width (cr, 0.2);
@@ -389,7 +394,7 @@ static gboolean analyze_time_draw_cb(GtkWidget *widget, cairo_t *cr,
 					cairo_fill(cr);
 				
 					cairo_set_line_width (cr, 1.5);
-					cairo_set_source_rgb(cr, 0.0, 0.0, 0.0);
+					cairo_set_source_rgba (cr, 1.0, 1.0, 1.0, 1.0);
 				
 					cairo_move_to(cr, (double)(width-left_shift)/(x_stop-x_start)*(kindex[0]-x_start-x_left+x_right), height-bot_shift);
 					cairo_line_to(cr, (double)(width-left_shift)/(x_stop-x_start)*(kindex[0]-x_start-x_left+x_right), height-bot_shift-(double)sum_spectras[kindex[0]]/(y_comp));

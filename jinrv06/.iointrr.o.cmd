@@ -1,7 +1,7 @@
-cmd_/root/job/0511vukdriver/jinrv06/iointrr.o := gcc -Wp,-MD,/root/job/0511vukdriver/jinrv06/.iointrr.o.d  -nostdinc -isystem /usr/lib/gcc/i486-slackware-linux/4.5.2/include -I/usr/src/linux-2.6.37.4/arch/x86/include -Iinclude  -include include/generated/autoconf.h -D__KERNEL__ -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common -Werror-implicit-function-declaration -Wno-format-security -fno-delete-null-pointer-checks -Os -m32 -msoft-float -mregparm=3 -freg-struct-return -mpreferred-stack-boundary=2 -march=i486 -mtune=generic -Wa,-mtune=generic32 -ffreestanding -DCONFIG_AS_CFI=1 -DCONFIG_AS_CFI_SIGNAL_FRAME=1 -DCONFIG_AS_CFI_SECTIONS=1 -pipe -Wno-sign-compare -fno-asynchronous-unwind-tables -mno-sse -mno-mmx -mno-sse2 -mno-3dnow -fno-stack-protector -fomit-frame-pointer -Wdeclaration-after-statement -Wno-pointer-sign -fno-strict-overflow -fconserve-stack -DCC_HAVE_ASM_GOTO  -DMODULE  -D"KBUILD_STR(s)=\#s" -D"KBUILD_BASENAME=KBUILD_STR(iointrr)"  -D"KBUILD_MODNAME=KBUILD_STR(iointrr)" -c -o /root/job/0511vukdriver/jinrv06/iointrr.o /root/job/0511vukdriver/jinrv06/iointrr.c
+cmd_/root/job/vukdriver-master/jinrv06/iointrr.o := gcc -Wp,-MD,/root/job/vukdriver-master/jinrv06/.iointrr.o.d  -nostdinc -isystem /usr/lib/gcc/i486-slackware-linux/4.5.2/include -I/usr/src/linux-2.6.37.4/arch/x86/include -Iinclude  -include include/generated/autoconf.h -D__KERNEL__ -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common -Werror-implicit-function-declaration -Wno-format-security -fno-delete-null-pointer-checks -Os -m32 -msoft-float -mregparm=3 -freg-struct-return -mpreferred-stack-boundary=2 -march=i486 -mtune=generic -Wa,-mtune=generic32 -ffreestanding -DCONFIG_AS_CFI=1 -DCONFIG_AS_CFI_SIGNAL_FRAME=1 -DCONFIG_AS_CFI_SECTIONS=1 -pipe -Wno-sign-compare -fno-asynchronous-unwind-tables -mno-sse -mno-mmx -mno-sse2 -mno-3dnow -fno-stack-protector -fomit-frame-pointer -Wdeclaration-after-statement -Wno-pointer-sign -fno-strict-overflow -fconserve-stack -DCC_HAVE_ASM_GOTO  -DMODULE  -D"KBUILD_STR(s)=\#s" -D"KBUILD_BASENAME=KBUILD_STR(iointrr)"  -D"KBUILD_MODNAME=KBUILD_STR(iointrr)" -c -o /root/job/vukdriver-master/jinrv06/iointrr.o /root/job/vukdriver-master/jinrv06/iointrr.c
 
-deps_/root/job/0511vukdriver/jinrv06/iointrr.o := \
-  /root/job/0511vukdriver/jinrv06/iointrr.c \
+deps_/root/job/vukdriver-master/jinrv06/iointrr.o := \
+  /root/job/vukdriver-master/jinrv06/iointrr.c \
   include/linux/kernel.h \
     $(wildcard include/config/lbdaf.h) \
     $(wildcard include/config/preempt/voluntary.h) \
@@ -824,6 +824,6 @@ deps_/root/job/0511vukdriver/jinrv06/iointrr.o := \
   include/net/rtnetlink.h \
   include/net/netlink.h \
 
-/root/job/0511vukdriver/jinrv06/iointrr.o: $(deps_/root/job/0511vukdriver/jinrv06/iointrr.o)
+/root/job/vukdriver-master/jinrv06/iointrr.o: $(deps_/root/job/vukdriver-master/jinrv06/iointrr.o)
 
-$(deps_/root/job/0511vukdriver/jinrv06/iointrr.o):
+$(deps_/root/job/vukdriver-master/jinrv06/iointrr.o):

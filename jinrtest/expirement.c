@@ -20,6 +20,11 @@
 
 #define READ_ONLINE_PERIOD 20000
 
+#define	BUFFER_DIR_PLACE	0
+#define BUFFER_START_PLACE	1
+#define BUFFER_ACC_PLACE	3
+#define BUFFER_INT_PLACE	5
+
 typedef struct {
 	int timespk[12][MAX_CH];
 	int energyspk[4][MAX_CH];
@@ -311,14 +316,14 @@ void start_expos_callback(GtkWidget *dialog, gint response, gpointer data)
 		loctime = localtime(&curtime);
 		strftime(infostruct.start, 80, "%d/%m/%y %T", loctime);
 
-		gtk_text_buffer_get_iter_at_line(info_buffer, &iter, 2);
-		gtk_text_buffer_get_iter_at_line_offset(info_buffer, &end, 3, 0);
+		gtk_text_buffer_get_iter_at_line(info_buffer, &iter, BUFFER_START_PLACE);
+		gtk_text_buffer_get_iter_at_line_offset(info_buffer, &end, BUFFER_START_PLACE+1, 0);
 		gtk_text_buffer_delete(info_buffer, &iter, &end);
 		gtk_text_buffer_insert_with_tags_by_name(info_buffer, &iter, 
 			g_strdup_printf("Start: %s\n", infostruct.start), -1, "bold", NULL);
 		
-		gtk_text_buffer_get_iter_at_line(info_buffer, &iter, 4);
-		gtk_text_buffer_get_iter_at_line_offset(info_buffer, &end, 5, 0);
+		gtk_text_buffer_get_iter_at_line(info_buffer, &iter, BUFFER_ACC_PLACE);
+		gtk_text_buffer_get_iter_at_line_offset(info_buffer, &end, BUFFER_ACC_PLACE+1, 0);
 		gtk_text_buffer_delete(info_buffer, &iter, &end);
 	
 		gtk_text_buffer_insert_with_tags_by_name(info_buffer, &iter, 
@@ -745,7 +750,6 @@ void read_conf_file()
 	
 	printf("status readed = %d\n", infostruct.status);
 	printf("seconds NOW = %ld, seconds to WAIT = %ld\n", convert_time_to_seconds(infostruct.start), convert_time_to_seconds(time_str) - (convert_time_to_seconds(infostruct.start)+infostruct.time));
-	printf("dates compare = %ld\n", compare_dates(infostruct.start));
 	
 	free(curr_path);
 	free(buffer);
